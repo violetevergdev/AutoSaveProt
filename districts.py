@@ -38,8 +38,8 @@ def search(gu_arr, current_value, out_dir):
             return gu_path
 
 
-def get_district(current_value, out_dir, server):
-    if server == "Москва":
+def get_district(current_value, out_dir, reg):
+    if reg == "Москва":
         new_path = search(msk, current_value, out_dir)
         return new_path
     else:

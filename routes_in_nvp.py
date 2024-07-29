@@ -10,12 +10,12 @@ from save_prot import save_prot
 
 
 def nvp_routes(driver, login, password, server, operation_type, start_date, end_date, out_dir):
-    if server == "Москва":
-        login_url = 'http://179'
-        table_url = 'http://179/Report.jsp'
+    login_url = 'http://10.87.0.' + server + ':90/aWEB'
+
+    if operation_type == "ДМО-Лёт" or operation_type == "ДМО-Шах":
+        table_url = 'http://10.87.0.' + server + ':9080/DMOcReport.jsp'
     else:
-        login_url = 'http://206'
-        table_url = 'http://206/Report.jsp'
+        table_url = 'http://10.87.0.' + server + ':9080/CommonlcReport.jsp'
 
     # Запуск НВП в Firefox
     driver.get(login_url)
@@ -36,10 +36,15 @@ def nvp_routes(driver, login, password, server, operation_type, start_date, end_
     # Ждем загрузки журнала
     WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.ID, 'form1:table1')))
 
-    select = Select(driver.find_element(By.ID, "form1:menu3"))
-    select.select_by_value("2")
+    if operation_type == "ДМО-Лёт" or operation_type == "ДМО-Шах":
+        select = Select(driver.find_element(By.ID, "form1:menuTFile"))
+        select.select_by_value("0")
+    else:
+        select = Select(driver.find_element(By.ID, "form1:menu3"))
+        select.select_by_value("2")
 
     ind = 0
+    page = 1
     last_row_in_page = 29
     start_iteration = True
 
@@ -62,13 +67,21 @@ def nvp_routes(driver, login, password, server, operation_type, start_date, end_
 
             # Если наши даты, то ...
             if our_row:
-                type_of_op_in_cell = driver.find_element(By.ID, 'form1:table1:' + str(ind) + ':text11')
+                type_of_op_in_cell = driver.find_element(By.ID, 'form1:table1:' + str(ind) +
+                                                         (':text11'
+                                                          if operation_type not in ("ДМО-Лёт", "ДМО-Шах")
+                                                          else ":textKat"))
 
                 if type_of_op_in_cell.text == operation_type:
-                    num_of_district = driver.find_element(By.ID, 'form1:table1:' + str(ind) + ':text22').text
+                    mode_in_cell = driver.find_element(By.ID, 'form1:table1:' + str(ind) +
+                                                       (':textMode'
+                                                        if operation_type not in ("ДМО-Лёт", "ДМО-Шах")
+                                                        else ":textSDPMode"))
+                    if mode_in_cell.text == 'с сохранением':
+                        num_of_district = driver.find_element(By.ID, 'form1:table1:' + str(ind) + ':text22').text
 
-                    # Проверка наличия протоколов в этом районе и их сохранение
-                    save_prot(out_dir, driver, ind, num_of_district)
+                        # Проверка наличия протоколов в этом районе и их сохранение
+                        save_prot(operation_type, out_dir, driver, ind, num_of_district)
 
             # Выход из цикла по причине полной итерации по нашим датам
             elif date_in_cell < start_date:
@@ -78,8 +91,14 @@ def nvp_routes(driver, login, password, server, operation_type, start_date, end_
 
             # Переключение на др. страницу если строка последняя
             if ind == last_row_in_page:
-                next_button = driver.find_element(By.ID, 'form1:table1:deluxe1__pagerNext')
+                next_button = driver.find_element(By.ID, 'form1:table1:' + (
+                    'deluxe1__pagerNext'
+                    if operation_type not in ("ДМО-Лёт", "ДМО-Шах")
+                    else "web1__pagerWeb__" + str(page) + '_next'))
                 next_button.click()
+
+            if operation_type in ("ДМО-Лёт", "ДМО-Шах"):
+                page += 1
 
             ind += 1
 

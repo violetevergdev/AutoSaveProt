@@ -1,8 +1,8 @@
 import os, datetime
 
-def make_out_dir(server):
+def make_out_dir(reg):
     desktop_path = os.path.join(os.path.expanduser('~'), 'Desktop')
-    if server == "Москва":
+    if reg == "Москва":
         dir_name = 'ПРОТОКОЛЫ МСК'
     else:
         dir_name = 'ПРОТОКОЛЫ ОБЛАСТЬ'

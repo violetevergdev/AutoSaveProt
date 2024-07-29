@@ -14,9 +14,13 @@ def is_district_dir_exists(out_dir, dir_name):
         return district_path
 
 
-def save_prot(out_dir, driver, i, district):
-    el_values_ids = [":text35", ":text34", ":text33", ":text32"]
-    el_links_ids = [":link8", ":link7", ":link6", ":link5"]
+def save_prot(type_of_op, out_dir, driver, i, district):
+    if type_of_op in ("ДМО-Лёт", "ДМО-Шах"):
+        el_values_ids = [":text23", ":text24", ":text25", ":text26"]
+        el_links_ids = [":linkViewPlusReport", ":linkViewMinusReport", ":linkViewEqReport", ":linkViewErrorReport"]
+    else:
+        el_values_ids = [":text35", ":text34", ":text33", ":text32"]
+        el_links_ids = [":link8", ":link7", ":link6", ":link5"]
 
     district_dir = is_district_dir_exists(out_dir, district)
 
