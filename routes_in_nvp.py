@@ -14,6 +14,8 @@ def nvp_routes(driver, login, password, server, operation_type, start_date, end_
 
     if operation_type == "ДМО-Лёт" or operation_type == "ДМО-Шах":
         table_url = 'http://10.87.0.' + server + ':9080/DMOcReport.jsp'
+    elif operation_type == "индексация ЕДВ":
+        table_url = 'http://10.87.0.' + server + ':9080/RecalcReport.jsp'
     else:
         table_url = 'http://10.87.0.' + server + ':9080/CommonlcReport.jsp'
 
@@ -67,16 +69,25 @@ def nvp_routes(driver, login, password, server, operation_type, start_date, end_
 
             # Если наши даты, то ...
             if our_row:
-                type_of_op_in_cell = driver.find_element(By.ID, 'form1:table1:' + str(ind) +
-                                                         (':text11'
-                                                          if operation_type not in ("ДМО-Лёт", "ДМО-Шах")
-                                                          else ":textKat"))
+                if operation_type in ("ДМО-Лёт", "ДМО-Шах"):
+                    type_id = ":textKat"
+                elif operation_type == "индексация ЕДВ":
+                    type_id = ":textVid14"
+                else:
+                    type_id = ':text11'
+
+                type_of_op_in_cell = driver.find_element(By.ID, 'form1:table1:' + str(ind) + type_id)
 
                 if type_of_op_in_cell.text == operation_type:
-                    mode_in_cell = driver.find_element(By.ID, 'form1:table1:' + str(ind) +
-                                                       (':textMode'
-                                                        if operation_type not in ("ДМО-Лёт", "ДМО-Шах")
-                                                        else ":textSDPMode"))
+                    if operation_type in ("ДМО-Лёт", "ДМО-Шах"):
+                        mode_id = ":textSDPMode"
+                    elif operation_type == "индексация ЕДВ":
+                        mode_id = ":text132"
+                    else:
+                        mode_id = ':textMode'
+
+                    mode_in_cell = driver.find_element(By.ID, 'form1:table1:' + str(ind) + mode_id)
+
                     if mode_in_cell.text == 'с сохранением':
                         num_of_district = driver.find_element(By.ID, 'form1:table1:' + str(ind) + ':text22').text
 
@@ -93,15 +104,15 @@ def nvp_routes(driver, login, password, server, operation_type, start_date, end_
             if ind == last_row_in_page:
                 next_button = driver.find_element(By.ID, 'form1:table1:' + (
                     'deluxe1__pagerNext'
-                    if operation_type not in ("ДМО-Лёт", "ДМО-Шах")
+                    if operation_type not in ("ДМО-Лёт", "ДМО-Шах", "индексация ЕДВ")
                     else "web1__pagerWeb__" + str(page) + '_next'))
                 next_button.click()
 
-            if operation_type in ("ДМО-Лёт", "ДМО-Шах"):
+            if operation_type in ("ДМО-Лёт", "ДМО-Шах", "индексация ЕДВ"):
                 page += 1
 
             ind += 1
 
-    time.sleep(3)
+    time.sleep(1)
 
     driver.close()
