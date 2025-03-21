@@ -5,6 +5,7 @@ from selenium.webdriver.firefox.service import Service
 def browser_init(out_dir):
     options = Options()
     options.headless = False
+    # options.binary_location = 'C:\\soft_for_py_exe\\Mozilla Firefox\\firefox.exe'
 
     options.set_preference("browser.download.folderList", 2)
     options.set_preference("browser.download.improvements_to_download_panel", False)

@@ -4,13 +4,12 @@ from routes_in_nvp import nvp_routes
 from move_districts_in_gu import move_destricts_in_gu
 
 
-def main(login, password, start_date, end_date, operation_type, reg, server):
-
+def main(login, password, start_date, end_date, operation_type, reg, server, statistic_state):
     out_dir = make_out_dir(reg)
 
     driver = browser_init(out_dir)
 
-    nvp_routes(driver, login, password, server, operation_type, start_date, end_date, out_dir)
+    nvp_routes(driver, login, password, server, operation_type, start_date, end_date, out_dir, statistic_state)
 
     move_destricts_in_gu(out_dir, reg)
 
